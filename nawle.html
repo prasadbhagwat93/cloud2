@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html>
+<body>
+
+<h1>My First Google Map</h1>
+
+<div id="googleMap" style="width:100%;height:400px;"></div>
+
+<script>
+
+function myMap() {
+var mapProp= {
+    center:new google.maps.LatLng(51.508742,-0.120850),
+    zoom:5,
+};
+
+var map=new google.maps.Map(document.getElementById("googleMap"),mapProp);
+}
+
+function showTable(obj){
+//alert(obj.value)
+//var xmlHttp = new XMLHttpRequest();
+try{
+var xmlHttp = new XMLHttpRequest();
+    //xmlHttp.open( "GET","https://maps.googleapis.com/maps/api/geocode/json?address=None+&key=AIzaSyCQk5ru6Y-42Z1kcsiae_O6oHBnDW_ib5w"); 
+     var params = JSON.stringify({ "test": obj.value });
+    xmlHttp.open( "POST","https://fvanaxeqh5.execute-api.us-east-1.amazonaws.com/prod/Twitt")
+	xmlHttp.send(JSON.stringify({ search_value: obj.value }));
+   var rsp;
+   xmlHttp.onreadystatechange = function() { 
+   		if(xmlHttp.status==200 && xmlHttp.readyState == 4){
+        rsp = xmlHttp.responseText;
+        alert(rsp);
+        initMap(obj.value);
+    }
+    else{
+    	rsp = xmlHttp.responseText;
+        alert(xmlHttp.status);
+    }
+    }
+  }
+
+catch(err) {
+	alert(err.message);
+	}
+}
+
+function initMap(obj) {
+		var locations =[];
+		var hits;
+		var leo = [];
+		var location_http;
+		var new_url;
+        var uluru = {lat: -25.363, lng: 131.044};
+        var nawle = {lat: -23.363, lng: 121.044};
+        var map = new google.maps.Map(document.getElementById('googleMap'), {
+          zoom: 4,
+          center: uluru
+        });
+        /*
+        var marker = new google.maps.Marker({
+          position: uluru,
+          position: nawle,
+          map: map
+        });
+        var marker = new google.maps.Marker({
+          position: uluru,
+          map: map
+        });*/
+        var http = new XMLHttpRequest();
+	try{
+	http.open( "GET","https://search-tits-7bmrnjvevlel3kx2ihkc73ruum.us-east-1.es.amazonaws.com/"+obj+"/_search?q=positive")
+	http.send()
+
+	http.onreadystatechange = function() { 
+   	if(http.status==200 && http.readyState == 4){
+        var rsp = http.responseText;
+       var jsonResponse = JSON.parse(rsp);
+		hits = jsonResponse["hits"]["hits"];
+		location_http = [];
+		for(var i =0; i< hits.length; i++){
+			locations.push(hits[i]['_source']['location'])
+			new_url = "https://maps.googleapis.com/maps/api/geocode/json?address="+hits[i]['_source']['location']+"&key=AIzaSyCqk2xG-5-v6vm4xB8q-4UwuYyNoL-b6L4"
+         	//leo.push(new_url);
+         	location_http[i] = new XMLHttpRequest();
+         	location_http[i].open( "GET",new_url);
+         	location_http[i].send();
+			//http.send()
+			leo.push(new_url);
+			//alert(hits[i])
+		
+		}
+		drawMap(locations,leo,map);
+    }
+    else{
+    	
+    }
+    }
+}
+
+catch(err){
+	alert(err.message)
+}		var leo =[];
+         
+		
+			
+      }
+
+ function drawMap(locations, leo,map){
+ 	
+	lat = []
+	long = []	
+	for(var i = 0; i< locations.length; i++) {
+    var xhrs = new XMLHttpRequest();
+    xhrs.open("GET", leo[i]);
+    xhrs.onreadystatechange = function() 
+    {
+        if (this.readyState == 4 && this.readyState == 4) 
+        {
+            var jsonResponse = JSON.parse(this.responseText);
+            try{
+            var lat1 = jsonResponse['results'][0]['geometry']['location']['lat'];
+            var lng1 = jsonResponse['results'][0]['geometry']['location']['lng'];
+            var uluru = {lat: lat1, lng: lng1};
+            var marker = new google.maps.Marker({
+          	position: uluru,
+          	map: map
+        });
+        	}
+        	catch(err){
+        	
+        	}
+        }
+    }
+    xhrs.send();
+
+}
+alert(leo);
+//alert(lat);
+ } 
+function yourFunction(){
+    // do whatever you like here
+    //alert("priyanak")
+    var http = new XMLHttpRequest();
+	try{
+	http.open( "GET","https://search-tits-7bmrnjvevlel3kx2ihkc73ruum.us-east-1.es.amazonaws.com/chelsea+/_search?q=positive")
+	http.send()
+
+	http.onreadystatechange = function() { 
+   	if(http.status==200 && http.readyState == 4){
+   		var rsp = http.responseText;
+   		var jsonResponse = JSON.parse(rsp);
+		var hits = jsonResponse["hits"]["total"];
+		document.getElementById("demo").innerHTML = "count is :" + hits;
+   	}
+   }
+}
+catch(err){
+	}
+    
+    setTimeout(yourFunction(), 5000);
+
+}
+function makeRequest(obj){
+    try{
+var xmlHttp = new XMLHttpRequest(); 
+     var params = JSON.stringify({ "test": obj.value });
+    xmlHttp.open( "POST","https://fvanaxeqh5.execute-api.us-east-1.amazonaws.com/prod/Twitt")
+    xmlHttp.send(JSON.stringify({ search_value: obj.value }));
+   var rsp;
+   xmlHttp.onreadystatechange = function() { 
+        if(xmlHttp.status==200 && xmlHttp.readyState == 4){
+        rsp = xmlHttp.responseText;
+       
+    }
+    else{
+        
+    }
+    }
+  }
+
+catch(err) {
+    alert(err.message);
+    }
+    setTimeout(makeRequest(obj), 5000);
+}
+
+//makeRequest(obj);
+//yourFunction();
+</script>
+
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCqk2xG-5-v6vm4xB8q-4UwuYyNoL-b6L4&callback=myMap"></script>
+<!--
+To use this code on your website, get a free API key from Google.
+Read more at: https://www.w3schools.com/graphics/google_maps_basic.asp
+-->
+
+</body>
+
+<input type="text" id="ad_search_query" style="width:295px">&nbsp; 
+<input type="button" value="search" class="p-userButton" onClick="showTable(document.getElementById('ad_search_query'));yourFunction(document.getElementById('ad_search_query'));makeRequest(document.getElementById('ad_search_query'));"/>
+<input type="text" id="sentiment">
+Enter Sentiment
+<p id="demo">Counter: 0</p>
+</html>
