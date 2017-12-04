@@ -30,12 +30,12 @@ var xmlHttp = new XMLHttpRequest();
    xmlHttp.onreadystatechange = function() { 
    		if(xmlHttp.status==200 && xmlHttp.readyState == 4){
         rsp = xmlHttp.responseText;
-        alert(rsp);
+        //alert(rsp);
         initMap(obj.value);
     }
     else{
     	rsp = xmlHttp.responseText;
-        alert(xmlHttp.status);
+        //alert(xmlHttp.status);
     }
     }
   }
@@ -57,26 +57,23 @@ function initMap(obj) {
           zoom: 4,
           center: uluru
         });
-        /*
-        var marker = new google.maps.Marker({
-          position: uluru,
-          position: nawle,
-          map: map
-        });
-        var marker = new google.maps.Marker({
-          position: uluru,
-          map: map
-        });*/
         var http = new XMLHttpRequest();
+        
 	try{
-	http.open( "GET","https://search-tits-7bmrnjvevlel3kx2ihkc73ruum.us-east-1.es.amazonaws.com/"+obj+"/_search?q=positive")
-	http.send()
+  var e = document.getElementById("ddlViewBy");
+  var strUser = e.options[e.selectedIndex].value; 
+  //alert(strUser); 
+  var jrl = "https://search-tits-7bmrnjvevlel3kx2ihkc73ruum.us-east-1.es.amazonaws.com/"+obj+"/_search?q="+strUser;
+  //alert(jrl);
+	http.open( "GET",jrl);
+	http.send();
 
 	http.onreadystatechange = function() { 
    	if(http.status==200 && http.readyState == 4){
         var rsp = http.responseText;
        var jsonResponse = JSON.parse(rsp);
 		hits = jsonResponse["hits"]["hits"];
+    //alert(hits.length)
 		location_http = [];
 		for(var i =0; i< hits.length; i++){
 			locations.push(hits[i]['_source']['location'])
@@ -110,6 +107,15 @@ catch(err){
  	
 	lat = []
 	long = []	
+  //alert(leo);
+  var color = ''
+  var e = document.getElementById("ddlViewBy");
+  var strUser = e.options[e.selectedIndex].value;
+  var image = 'https://developers.google.com/maps/documentation/javascript/examples/full/images/beachflag.png'
+  if (strUser == "negative"){
+    color = image
+  }
+  
 	for(var i = 0; i< locations.length; i++) {
     var xhrs = new XMLHttpRequest();
     xhrs.open("GET", leo[i]);
@@ -121,10 +127,12 @@ catch(err){
             try{
             var lat1 = jsonResponse['results'][0]['geometry']['location']['lat'];
             var lng1 = jsonResponse['results'][0]['geometry']['location']['lng'];
+            //alert(lat1);
             var uluru = {lat: lat1, lng: lng1};
             var marker = new google.maps.Marker({
           	position: uluru,
-          	map: map
+          	map: map,
+            icon: color
         });
         	}
         	catch(err){
@@ -135,58 +143,61 @@ catch(err){
     xhrs.send();
 
 }
-alert(leo);
+//alert(leo);
 //alert(lat);
  } 
-function yourFunction(){
-    // do whatever you like here
-    
-    var http = new XMLHttpRequest();
-	try{
-	http.open( "GET","https://search-tits-7bmrnjvevlel3kx2ihkc73ruum.us-east-1.es.amazonaws.com/chelsea+/_search?q=positive")
-	http.send()
 
-	http.onreadystatechange = function() { 
-   	if(http.status==200 && http.readyState == 4){
-   		var rsp = http.responseText;
-   		var jsonResponse = JSON.parse(rsp);
-		var hits = jsonResponse["hits"]["total"];
-		document.getElementById("demo").innerHTML = "count is :" + hits;
-   	}
-   }
-}
-catch(err){
-	}
-    
-    setTimeout(yourFunction(), 5000);
 
-}
-function makeRequest(obj){
-    try{
+window.setInterval(function () {
+  try{
 var xmlHttp = new XMLHttpRequest(); 
-     var params = JSON.stringify({ "test": obj.value });
+     //var params = JSON.stringify({ "test": document.getElementById('ad_search_query')});
     xmlHttp.open( "POST","https://fvanaxeqh5.execute-api.us-east-1.amazonaws.com/prod/Twitt")
-    xmlHttp.send(JSON.stringify({ search_value: obj.value }));
+    xmlHttp.send(JSON.stringify({ search_value: document.getElementById('ad_search_query').value }));
    var rsp;
    xmlHttp.onreadystatechange = function() { 
         if(xmlHttp.status==200 && xmlHttp.readyState == 4){
         rsp = xmlHttp.responseText;
+        //alert(document.getElementById('ad_search_query').value)
        
     }
     else{
-        
+        //alert(xmlHttp.responseText);
     }
     }
   }
 
 catch(err) {
-    alert(err.message);
+    //alert(err.message);
     }
-    setTimeout(makeRequest(obj), 5000);
-}
 
-//makeRequest(obj);
-//yourFunction();
+}, 5000);
+
+window.setInterval(function () {
+  var http = new XMLHttpRequest();
+    //alert("hmmmm");
+  try{
+  var e = document.getElementById("ddlViewBy");
+  var strUser = e.options[e.selectedIndex].value; 
+  //alert(strUser); 
+  obj = document.getElementById('ad_search_query').value;
+  var jrl = "https://search-tits-7bmrnjvevlel3kx2ihkc73ruum.us-east-1.es.amazonaws.com/"+obj+"/_search?q="+strUser;  
+  http.open( "GET",jrl)
+  http.send()
+
+  http.onreadystatechange = function() { 
+    if(http.status==200 && http.readyState == 4){
+      var rsp = http.responseText;
+      var jsonResponse = JSON.parse(rsp);
+    var hits = jsonResponse["hits"]["total"];
+    document.getElementById("demo").innerHTML = "count is :" + hits;
+    }
+   }
+}
+catch(err){
+  }
+
+    }, 3000);
 </script>
 
 <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCqk2xG-5-v6vm4xB8q-4UwuYyNoL-b6L4&callback=myMap"></script>
@@ -198,8 +209,12 @@ Read more at: https://www.w3schools.com/graphics/google_maps_basic.asp
 </body>
 
 <input type="text" id="ad_search_query" style="width:295px">&nbsp; 
-<input type="button" value="search" class="p-userButton" onClick="showTable(document.getElementById('ad_search_query'));yourFunction(document.getElementById('ad_search_query'));makeRequest(document.getElementById('ad_search_query'));"/>
-<input type="text" id="sentiment">
+<input type="button" value="search" class="p-userButton" onClick="showTable(document.getElementById('ad_search_query'))"/>
+<select id="ddlViewBy">
+  <option value="positive">positve</option>
+  <option value="negative">negative</option>
+  <option value="neutral">neutral</option>
+</select> 
 Enter Sentiment
 <p id="demo">Counter: 0</p>
 </html>
